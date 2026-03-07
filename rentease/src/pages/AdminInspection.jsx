@@ -7,16 +7,16 @@ const STATUS_COLORS = {
   cancelled: "bg-red-100 text-red-600",
 }
 
+const WHATSAPP_NUMBER = "2348149769770"
+
 export default function AdminInspections() {
   const [inspections, setInspections] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  const whatsappNumber = "2348000000000" // 🔁 Replace with your real number
+  const [loading, setLoading]         = useState(true)
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        const res = await axios.get("/api/inspections")
+        const res = await axios.get("/inspections")
         setInspections(res.data)
       } catch (err) {
         console.error("Failed to fetch inspections", err)
@@ -29,7 +29,7 @@ export default function AdminInspections() {
 
   const updateStatus = async (inspectionId, status) => {
     try {
-      await axios.patch(`/api/inspections/${inspectionId}`, { status })
+      await axios.patch(`/inspections/${inspectionId}`, { status })
       setInspections((prev) =>
         prev.map((i) => (i._id === inspectionId ? { ...i, status } : i))
       )
@@ -39,20 +39,45 @@ export default function AdminInspections() {
     }
   }
 
-  const makeWhatsAppLink = (inspection) => {
+  const makeWhatsAppLink = (insp) => {
     const msg = encodeURIComponent(
-      `Hi ${inspection.buyerName}! This is RentEase. Your property inspection is confirmed for ${inspection.date} at ${inspection.time}. Please be available. Thank you!`
+      `Hi ${insp.buyerName}! This is RentEase.\n\n` +
+      `Your property inspection is ${insp.status === 'confirmed' ? '✅ CONFIRMED' : '❌ CANCELLED'}.\n\n` +
+      `Property: ${insp.property?.title || 'Property'}\n` +
+      `Date: ${insp.date}\n` +
+      `Time: ${insp.time}\n\n` +
+      `Thank you for choosing RentEase!`
     )
-    return `https://wa.me/${inspection.buyerPhone.replace(/\D/g, "")}?text=${msg}`
+    const phone = insp.buyerPhone?.replace(/\D/g, '')
+    return `https://wa.me/${phone}?text=${msg}`
+  }
+
+  const adminWhatsApp = (insp) => {
+    const msg = encodeURIComponent(
+      `📅 New Inspection Booking\n\n` +
+      `Property: ${insp.property?.title || 'Property'}\n` +
+      `Buyer: ${insp.buyerName}\n` +
+      `Phone: ${insp.buyerPhone}\n` +
+      `Address: ${insp.buyerAddress || 'Not provided'}\n` +
+      `Date: ${insp.date}\n` +
+      `Time: ${insp.time}\n` +
+      `Message: ${insp.message || 'None'}`
+    )
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`
   }
 
   if (loading) {
-    return <div className="p-10 text-center text-gray-500">Loading inspections...</div>
+    return (
+      <div className="p-10 text-center text-gray-500">
+        Loading inspections...
+      </div>
+    )
   }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
 
+      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">
@@ -62,25 +87,52 @@ export default function AdminInspections() {
             {inspections.length} booking{inspections.length !== 1 ? "s" : ""} total
           </p>
         </div>
+
+        {/* Stats */}
+        <div className="flex gap-4 text-sm">
+          <div className="bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-xl text-center">
+            <p className="font-bold text-yellow-700 text-lg">
+              {inspections.filter(i => i.status === 'pending').length}
+            </p>
+            <p className="text-yellow-600">Pending</p>
+          </div>
+          <div className="bg-green-50 border border-green-200 px-4 py-2 rounded-xl text-center">
+            <p className="font-bold text-green-700 text-lg">
+              {inspections.filter(i => i.status === 'confirmed').length}
+            </p>
+            <p className="text-green-600">Confirmed</p>
+          </div>
+          <div className="bg-red-50 border border-red-200 px-4 py-2 rounded-xl text-center">
+            <p className="font-bold text-red-600 text-lg">
+              {inspections.filter(i => i.status === 'cancelled').length}
+            </p>
+            <p className="text-red-500">Cancelled</p>
+          </div>
+        </div>
       </div>
 
+      {/* Empty state */}
       {inspections.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <p className="text-5xl mb-4">📅</p>
-          <p className="text-lg">No inspections booked yet.</p>
-          <p className="text-sm mt-1">They will appear here when buyers schedule visits.</p>
+          <p className="text-lg font-medium">No inspections booked yet</p>
+          <p className="text-sm mt-1">
+            They will appear here when buyers schedule visits.
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600">
+            <thead className="bg-gray-50 text-gray-600 text-left">
               <tr>
-                <th className="p-4 text-left">Property</th>
-                <th className="p-4 text-left">Buyer</th>
-                <th className="p-4 text-left">Phone</th>
-                <th className="p-4 text-left">Date & Time</th>
-                <th className="p-4 text-left">Status</th>
-                <th className="p-4 text-left">Actions</th>
+                <th className="p-4">Property</th>
+                <th className="p-4">Buyer</th>
+                <th className="p-4">Phone</th>
+                <th className="p-4">Address</th>
+                <th className="p-4">Date & Time</th>
+                <th className="p-4">Message</th>
+                <th className="p-4">Status</th>
+                <th className="p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -91,28 +143,48 @@ export default function AdminInspections() {
                     {insp.property?.title || "Property"}
                   </td>
 
-                  <td className="p-4 text-gray-700">
-                    {insp.buyerName}
+                  <td className="p-4">
+                    <p className="font-medium text-gray-800">{insp.buyerName}</p>
+                    {insp.buyerEmail && (
+                      <p className="text-xs text-gray-400">{insp.buyerEmail}</p>
+                    )}
                   </td>
 
-                  <td className="p-4 text-gray-600">
-                    {insp.buyerPhone}
+                  {/* Phone — private */}
+                  <td className="p-4">
+                    <span className="flex items-center gap-1 text-gray-700">
+                      🔒 {insp.buyerPhone}
+                    </span>
                   </td>
 
-                  <td className="p-4 text-gray-600">
-                    <span className="font-medium">{insp.date}</span>
-                    <br />
-                    <span className="text-xs text-gray-400">{insp.time}</span>
+                  {/* Address — private */}
+                  <td className="p-4">
+                    <span className="flex items-center gap-1 text-gray-700">
+                      🔒 {insp.buyerAddress || (
+                        <span className="text-gray-400 italic">Not provided</span>
+                      )}
+                    </span>
                   </td>
 
                   <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${STATUS_COLORS[insp.status] || STATUS_COLORS.pending}`}>
+                    <p className="font-semibold text-gray-800">{insp.date}</p>
+                    <p className="text-xs text-gray-400">{insp.time}</p>
+                  </td>
+
+                  <td className="p-4 text-gray-500 max-w-xs">
+                    <p className="truncate">{insp.message || "—"}</p>
+                  </td>
+
+                  <td className="p-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
+                      STATUS_COLORS[insp.status] || STATUS_COLORS.pending
+                    }`}>
                       {insp.status || "pending"}
                     </span>
                   </td>
 
                   <td className="p-4">
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex flex-col gap-2">
 
                       {/* Confirm */}
                       {insp.status !== "confirmed" && (
@@ -134,7 +206,7 @@ export default function AdminInspections() {
                         </button>
                       )}
 
-                      {/* WhatsApp */}
+                      {/* WhatsApp buyer */}
                       
                         href={makeWhatsAppLink(insp)}
                         target="_blank"
@@ -144,7 +216,17 @@ export default function AdminInspections() {
                         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                         </svg>
-                        WhatsApp
+                        WhatsApp Buyer
+                      </a>
+
+                      {/* WhatsApp admin notification */}
+                      
+                        href={adminWhatsApp(insp)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs px-3 py-1.5 rounded-lg transition"
+                      >
+                        📋 Send to Admin
                       </a>
 
                     </div>
