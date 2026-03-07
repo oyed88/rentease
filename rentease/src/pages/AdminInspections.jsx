@@ -48,7 +48,7 @@ export default function AdminInspections() {
   const buyerWhatsApp = (insp) => {
     const msg = encodeURIComponent(
       `Hi ${insp.buyerName}! This is RentEase.\n\n` +
-      `Your inspection is ${insp.status === "confirmed" ? "✅ CONFIRMED" : "updated"}.\n\n` +
+      `Your inspection is ${insp.status === "confirmed" ? "CONFIRMED" : "updated"}.\n\n` +
       `Property: ${insp.property?.title || "Property"}\n` +
       `Date: ${insp.date}\n` +
       `Time: ${insp.time}\n\n` +
@@ -60,7 +60,7 @@ export default function AdminInspections() {
 
   const adminWhatsApp = (insp) => {
     const msg = encodeURIComponent(
-      `📅 Inspection Booking\n\n` +
+      `Inspection Booking\n\n` +
       `Property: ${insp.property?.title || "Property"}\n` +
       `Buyer: ${insp.buyerName}\n` +
       `Phone: ${insp.buyerPhone}\n` +
@@ -83,18 +83,14 @@ export default function AdminInspections() {
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
 
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
-            Property Inspections
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-800">Property Inspections</h1>
           <p className="text-gray-500 text-sm mt-1">
             {inspections.length} booking{inspections.length !== 1 ? "s" : ""} total
           </p>
         </div>
 
-        {/* Stats */}
         <div className="flex gap-3 text-sm">
           <div className="bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-xl text-center">
             <p className="font-bold text-yellow-700 text-lg">
@@ -117,14 +113,11 @@ export default function AdminInspections() {
         </div>
       </div>
 
-      {/* Empty state */}
       {inspections.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <p className="text-5xl mb-4">📅</p>
           <p className="text-lg font-medium">No inspections booked yet</p>
-          <p className="text-sm mt-1">
-            They will appear here when buyers schedule visits.
-          </p>
+          <p className="text-sm mt-1">They will appear here when buyers schedule visits.</p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
@@ -133,9 +126,9 @@ export default function AdminInspections() {
               <tr>
                 <th className="p-4">Property</th>
                 <th className="p-4">Buyer</th>
-                <th className="p-4">Phone 🔒</th>
-                <th className="p-4">Address 🔒</th>
-                <th className="p-4">Date & Time</th>
+                <th className="p-4">Phone</th>
+                <th className="p-4">Address</th>
+                <th className="p-4">Date and Time</th>
                 <th className="p-4">Message</th>
                 <th className="p-4">Status</th>
                 <th className="p-4">Actions</th>
@@ -157,11 +150,13 @@ export default function AdminInspections() {
                   </td>
 
                   <td className="p-4 text-gray-700">
-                    {insp.buyerPhone}
+                    🔒 {insp.buyerPhone}
                   </td>
 
                   <td className="p-4 text-gray-700">
-                    {insp.buyerAddress || (
+                    {insp.buyerAddress ? (
+                      <span>🔒 {insp.buyerAddress}</span>
+                    ) : (
                       <span className="text-gray-400 italic">Not provided</span>
                     )}
                   </td>
@@ -189,7 +184,7 @@ export default function AdminInspections() {
                           onClick={() => updateStatus(insp._id, "confirmed")}
                           className="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-lg transition"
                         >
-                          ✓ Confirm
+                          Confirm
                         </button>
                       )}
 
@@ -198,11 +193,11 @@ export default function AdminInspections() {
                           onClick={() => updateStatus(insp._id, "cancelled")}
                           className="bg-red-100 hover:bg-red-200 text-red-600 text-xs px-3 py-1.5 rounded-lg transition"
                         >
-                          ✗ Cancel
+                          Cancel
                         </button>
                       )}
 
-                      
+                      <a
                         href={buyerWhatsApp(insp)}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -212,13 +207,13 @@ export default function AdminInspections() {
                         WhatsApp Buyer
                       </a>
 
-                      
+                      <a
                         href={adminWhatsApp(insp)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs px-3 py-1.5 rounded-lg transition"
                       >
-                        📋 Send to Admin
+                        Send to Admin
                       </a>
 
                     </div>

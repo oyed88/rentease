@@ -20,25 +20,23 @@ const WhatsAppIcon = ({ className = 'w-5 h-5' }) => (
 export default function PropertyDetails() {
   const { id } = useParams()
 
-  const [property, setProperty]     = useState(null)
-  const [loading, setLoading]       = useState(true)
+  const [property, setProperty] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [activeImage, setActiveImage] = useState(0)
 
-  // Form state
-  const [showForm, setShowForm]         = useState(false)
-  const [formType, setFormType]         = useState('interest') // 'interest' | 'inspection'
-  const [submitting, setSubmitting]     = useState(false)
-  const [submitted, setSubmitted]       = useState(false)
-  const [formError, setFormError]       = useState('')
+  const [showForm, setShowForm] = useState(false)
+  const [formType, setFormType] = useState('interest')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [formError, setFormError] = useState('')
 
-  // Form fields
-  const [name, setName]       = useState('')
-  const [email, setEmail]     = useState('')
-  const [phone, setPhone]     = useState('')
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
   const [message, setMessage] = useState('')
-  const [date, setDate]       = useState('')
-  const [time, setTime]       = useState('')
+  const [date, setDate] = useState('')
+  const [time, setTime] = useState('')
 
   const WHATSAPP_NUMBER = '2348149769770'
 
@@ -81,7 +79,6 @@ export default function PropertyDetails() {
   }
 
   const handleSubmit = async () => {
-    // Validate required fields
     if (!name.trim() || !phone.trim()) {
       setFormError('Name and phone number are required.')
       return
@@ -96,10 +93,9 @@ export default function PropertyDetails() {
 
     try {
       if (formType === 'inspection') {
-        // ── Book Inspection ──
         await axios.post('/inspections', {
-          property:   id,
-          buyerName:  name,
+          property: id,
+          buyerName: name,
           buyerEmail: email,
           buyerPhone: phone,
           buyerAddress: address,
@@ -108,17 +104,15 @@ export default function PropertyDetails() {
           message,
         })
       } else {
-        // ── I'm Interested / Send Message ──
         await axios.post('/leads', {
-          property:     id,
-          buyerName:    name,
-          buyerEmail:   email,
-          buyerPhone:   phone,
+          property: id,
+          buyerName: name,
+          buyerEmail: email,
+          buyerPhone: phone,
           buyerAddress: address,
           message,
         })
       }
-
       setSubmitted(true)
       resetForm()
     } catch (err) {
@@ -146,12 +140,11 @@ export default function PropertyDetails() {
     size, amenities, landlord, isVerified, views,
   } = property
 
-  // WhatsApp pre-filled message
   const whatsappMessage = encodeURIComponent(
     `Hi! I found a property on RentEase I'm interested in.\n\n` +
-    `🏠 Property: ${title}\n` +
-    `📍 Location: ${location?.city}, ${location?.state}\n` +
-    `💰 Price: ${formatPrice(price)}\n\n` +
+    `Property: ${title}\n` +
+    `Location: ${location?.city}, ${location?.state}\n` +
+    `Price: ${formatPrice(price)}\n\n` +
     `Please contact me with more details.`
   )
   const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`
@@ -161,14 +154,14 @@ export default function PropertyDetails() {
 
       {/* Breadcrumb */}
       <div className="text-sm text-gray-500 mb-6">
-        <Link to="/">Home</Link> →{' '}
-        <Link to="/properties">Properties</Link> →{' '}
+        <Link to="/">Home</Link> {' → '}
+        <Link to="/properties">Properties</Link> {' → '}
         <span className="text-gray-800">{title}</span>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-10">
 
-        {/* ── LEFT SIDE ── */}
+        {/* LEFT SIDE */}
         <div className="flex-1">
 
           {/* Main Image */}
@@ -203,32 +196,26 @@ export default function PropertyDetails() {
             </div>
           )}
 
-          {/* Title */}
           <h1 className="text-3xl font-bold mb-2">{title}</h1>
 
           <p className="text-gray-500 mb-4">
             📍 {location?.address}, {location?.city}, {location?.state}
           </p>
 
-          {/* Stats */}
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-6">
             <span>🛏 {bedrooms} Bedrooms</span>
             <span>🚿 {bathrooms} Bathrooms</span>
             {size > 0 && <span>📐 {size} m²</span>}
             <span>🏠 {type}</span>
             <span>👁 {views} views</span>
-            {isVerified && (
-              <span className="text-green-600 font-semibold">✅ Verified</span>
-            )}
+            {isVerified && <span className="text-green-600 font-semibold">✅ Verified</span>}
           </div>
 
-          {/* Description */}
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-3">Description</h2>
             <p className="text-gray-600 leading-relaxed">{description}</p>
           </div>
 
-          {/* Amenities */}
           {amenities?.length > 0 && (
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-3">Amenities</h2>
@@ -242,20 +229,18 @@ export default function PropertyDetails() {
             </div>
           )}
 
-          {/* ── PRIVATE NOTICE (visible to public, details go to admin only) ── */}
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-700">
-            🔒 <strong>Privacy notice:</strong> When you submit your phone number and address
-            through our contact forms, this information is kept <strong>private</strong> and
-            only visible to the RentEase admin. It will never be shown publicly.
+            🔒 <strong>Privacy notice:</strong> Your phone number and address submitted through
+            our forms are <strong>private</strong> and only visible to the RentEase admin.
+            Never shown publicly.
           </div>
 
         </div>
 
-        {/* ── RIGHT SIDE ── */}
+        {/* RIGHT SIDE */}
         <aside className="lg:w-80">
           <div className="card p-6 sticky top-24">
 
-            {/* Price */}
             <p className="text-3xl font-bold text-blue-600 mb-1">
               {formatPrice(price)}
             </p>
@@ -263,16 +248,12 @@ export default function PropertyDetails() {
               <p className="text-sm text-gray-400 mb-2">per year</p>
             )}
 
-            {/* Purpose badge */}
             <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4 ${
-              purpose === 'rent'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-green-100 text-green-700'
+              purpose === 'rent' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
             }`}>
               For {purpose === 'rent' ? 'Rent' : 'Sale'}
             </span>
 
-            {/* Landlord */}
             <div className="border-t pt-4 mb-6">
               <p className="text-sm text-gray-500 mb-3">Listed by</p>
               <div className="flex items-center gap-3">
@@ -286,10 +267,9 @@ export default function PropertyDetails() {
               </div>
             </div>
 
-            {/* ── ACTION BUTTONS ── */}
+            {/* ACTION BUTTONS */}
             <div className="flex flex-col gap-3">
 
-              {/* I'm Interested */}
               <button
                 onClick={() => openForm('interest')}
                 className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition"
@@ -297,7 +277,6 @@ export default function PropertyDetails() {
                 ⭐ I'm Interested
               </button>
 
-              {/* Book Inspection */}
               <button
                 onClick={() => openForm('inspection')}
                 className="flex items-center justify-center gap-2 w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition"
@@ -305,8 +284,7 @@ export default function PropertyDetails() {
                 🏠 Book Inspection
               </button>
 
-              {/* WhatsApp */}
-              
+              <a
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -316,7 +294,6 @@ export default function PropertyDetails() {
                 Chat on WhatsApp
               </a>
 
-              {/* Open Chat */}
               <Link
                 to="/messages"
                 className="flex items-center justify-center gap-2 w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-xl transition text-center"
@@ -326,9 +303,8 @@ export default function PropertyDetails() {
 
             </div>
 
-            {/* Privacy note on sidebar */}
             <p className="text-xs text-gray-400 mt-4 text-center">
-              🔒 Your phone & address are private — admin only
+              🔒 Your phone and address are private — admin only
             </p>
 
           </div>
@@ -336,9 +312,7 @@ export default function PropertyDetails() {
 
       </div>
 
-      {/* ════════════════════════════════════════════
-          CONTACT FORM POPUP
-      ════════════════════════════════════════════ */}
+      {/* CONTACT FORM POPUP */}
       {showForm && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"
@@ -346,23 +320,16 @@ export default function PropertyDetails() {
         >
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
 
-            {/* Form Header */}
-            <div className={`p-6 pb-4 rounded-t-2xl ${
-              formType === 'inspection'
-                ? 'bg-orange-500'
-                : 'bg-blue-600'
-            }`}>
+            <div className={`p-6 pb-4 rounded-t-2xl ${formType === 'inspection' ? 'bg-orange-500' : 'bg-blue-600'}`}>
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold text-white">
-                    {formType === 'inspection'
-                      ? '🏠 Book Property Inspection'
-                      : '⭐ Express Interest'}
+                    {formType === 'inspection' ? '🏠 Book Property Inspection' : '⭐ Express Interest'}
                   </h2>
                   <p className="text-sm text-white/80 mt-1">
                     {formType === 'inspection'
                       ? 'Schedule a visit to see this property'
-                      : 'Let us know you\'re interested in this property'}
+                      : "Let us know you're interested"}
                   </p>
                 </div>
                 <button
@@ -376,24 +343,18 @@ export default function PropertyDetails() {
 
             <div className="p-6">
 
-              {/* ── SUCCESS STATE ── */}
               {submitted ? (
                 <div className="text-center py-6">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">✅</span>
                   </div>
                   <h3 className="text-lg font-bold text-gray-800 mb-2">
-                    {formType === 'inspection'
-                      ? 'Inspection Booked!'
-                      : 'Interest Submitted!'}
+                    {formType === 'inspection' ? 'Inspection Booked!' : 'Interest Submitted!'}
                   </h3>
                   <p className="text-gray-500 text-sm mb-6">
-                    We've received your details. The admin will contact you shortly.
-                    You can also reach us directly on WhatsApp.
+                    We have received your details. The admin will contact you shortly.
                   </p>
-
-                  {/* WhatsApp after success */}
-                  
+                  <a
                     href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -402,7 +363,6 @@ export default function PropertyDetails() {
                     <WhatsAppIcon />
                     Follow Up on WhatsApp
                   </a>
-
                   <button
                     onClick={closeForm}
                     className="text-sm text-gray-400 hover:text-gray-600"
@@ -411,8 +371,9 @@ export default function PropertyDetails() {
                   </button>
                 </div>
               ) : (
-                <>
-                  {/* ── Property being enquired ── */}
+                <div>
+
+                  {/* Property preview */}
                   <div className="bg-gray-50 rounded-xl p-3 mb-5 flex items-center gap-3">
                     {images?.[0]?.url && (
                       <img
@@ -423,23 +384,17 @@ export default function PropertyDetails() {
                     )}
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-800 text-sm truncate">{title}</p>
-                      <p className="text-xs text-gray-400 truncate">
-                        📍 {location?.city}, {location?.state}
-                      </p>
+                      <p className="text-xs text-gray-400 truncate">📍 {location?.city}, {location?.state}</p>
                       <p className="text-xs font-bold text-blue-600">{formatPrice(price)}</p>
                     </div>
                   </div>
 
-                  {/* ── Error ── */}
                   {formError && (
                     <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
                       ⚠️ {formError}
                     </div>
                   )}
 
-                  {/* ── FORM FIELDS ── */}
-
-                  {/* Name */}
                   <div className="mb-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Full Name <span className="text-red-500">*</span>
@@ -453,13 +408,10 @@ export default function PropertyDetails() {
                     />
                   </div>
 
-                  {/* Phone */}
                   <div className="mb-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Phone Number <span className="text-red-500">*</span>
-                      <span className="text-xs text-gray-400 font-normal ml-1">
-                        (🔒 private — admin only)
-                      </span>
+                      <span className="text-xs text-gray-400 font-normal ml-1">(🔒 private)</span>
                     </label>
                     <input
                       type="tel"
@@ -470,7 +422,6 @@ export default function PropertyDetails() {
                     />
                   </div>
 
-                  {/* Email */}
                   <div className="mb-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Email Address
@@ -485,13 +436,10 @@ export default function PropertyDetails() {
                     />
                   </div>
 
-                  {/* Address */}
                   <div className="mb-3">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Your Address
-                      <span className="text-xs text-gray-400 font-normal ml-1">
-                        (🔒 private — admin only)
-                      </span>
+                      <span className="text-xs text-gray-400 font-normal ml-1">(🔒 private)</span>
                     </label>
                     <input
                       type="text"
@@ -502,9 +450,8 @@ export default function PropertyDetails() {
                     />
                   </div>
 
-                  {/* Inspection-only: Date + Time */}
                   {formType === 'inspection' && (
-                    <>
+                    <div>
                       <div className="mb-3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Preferred Date <span className="text-red-500">*</span>
@@ -539,21 +486,16 @@ export default function PropertyDetails() {
                           <option>5:00 PM</option>
                         </select>
                       </div>
-                    </>
+                    </div>
                   )}
 
-                  {/* Message */}
                   <div className="mb-5">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Message
                       <span className="text-xs text-gray-400 font-normal ml-1">(optional)</span>
                     </label>
                     <textarea
-                      placeholder={
-                        formType === 'inspection'
-                          ? 'Any special requests for the inspection?'
-                          : 'Tell us more about what you\'re looking for...'
-                      }
+                      placeholder={formType === 'inspection' ? 'Any special requests?' : "Tell us what you're looking for..."}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       rows={3}
@@ -561,34 +503,22 @@ export default function PropertyDetails() {
                     />
                   </div>
 
-                  {/* Privacy reminder */}
                   <div className="bg-gray-50 rounded-xl px-4 py-3 mb-4 text-xs text-gray-500 flex gap-2">
                     <span>🔒</span>
-                    <span>
-                      Your phone number and address are <strong>private</strong>.
-                      They are only visible to the RentEase admin and never shown to other users.
-                    </span>
+                    <span>Your phone and address are <strong>private</strong> — only visible to the admin.</span>
                   </div>
 
-                  {/* Submit */}
                   <button
                     onClick={handleSubmit}
                     disabled={submitting}
                     className={`w-full text-white font-semibold py-3 rounded-xl transition mb-3 disabled:opacity-60 ${
-                      formType === 'inspection'
-                        ? 'bg-orange-500 hover:bg-orange-600'
-                        : 'bg-blue-600 hover:bg-blue-700'
+                      formType === 'inspection' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-600 hover:bg-blue-700'
                     }`}
                   >
-                    {submitting
-                      ? 'Sending...'
-                      : formType === 'inspection'
-                      ? '📅 Confirm Inspection Booking'
-                      : '⭐ Submit Interest'}
+                    {submitting ? 'Sending...' : formType === 'inspection' ? '📅 Confirm Inspection' : '⭐ Submit Interest'}
                   </button>
 
-                  {/* WhatsApp alternative */}
-                  
+                  <a
                     href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -598,7 +528,6 @@ export default function PropertyDetails() {
                     Or Contact Us on WhatsApp
                   </a>
 
-                  {/* Cancel */}
                   <button
                     onClick={closeForm}
                     className="w-full text-sm text-gray-400 hover:text-gray-600 py-2"
@@ -606,8 +535,9 @@ export default function PropertyDetails() {
                     Cancel
                   </button>
 
-                </>
+                </div>
               )}
+
             </div>
           </div>
         </div>
