@@ -17,6 +17,11 @@ import AdminLeads from "./pages/AdminLeads"
 import BookInspection from "./pages/BookInspection"
 import AdminInspections from "./pages/AdminInspections"
 
+// Venues & Bookings
+import Venues from "./pages/Venues"
+import VenueDetails from "./pages/VenueDetails"
+import AdminBookings from "./pages/AdminBookings"
+
 // Components
 import PropertyForm from "./components/property/PropertyForm"
 
@@ -33,14 +38,16 @@ function App() {
               <Routes>
 
                 {/* ── Public Routes ── */}
-                <Route path="/"                    element={<Home />} />
-                <Route path="/login"               element={<Login />} />
-                <Route path="/register"            element={<Register />} />
-                <Route path="/properties"          element={<PropertyListings />} />
-                <Route path="/properties/:id"      element={<PropertyDetails />} />
-
-                {/* Public — any buyer can book without logging in */}
+                <Route path="/"                       element={<Home />} />
+                <Route path="/login"                  element={<Login />} />
+                <Route path="/register"               element={<Register />} />
+                <Route path="/properties"             element={<PropertyListings />} />
+                <Route path="/properties/:id"         element={<PropertyDetails />} />
                 <Route path="/properties/:id/inspect" element={<BookInspection />} />
+
+                {/* ── Venues & Bookings (public) ── */}
+                <Route path="/venues"                 element={<Venues />} />
+                <Route path="/venues/:id"             element={<VenueDetails />} />
 
                 {/* ── Protected Routes ── */}
                 <Route path="/dashboard" element={
@@ -62,6 +69,10 @@ function App() {
 
                 <Route path="/admin/inspections" element={
                   <ProtectedRoute><AdminInspections /></ProtectedRoute>
+                }/>
+
+                <Route path="/admin/bookings" element={
+                  <ProtectedRoute><AdminBookings /></ProtectedRoute>
                 }/>
 
               </Routes>

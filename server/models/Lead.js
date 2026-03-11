@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const InspectionSchema = new mongoose.Schema(
+const LeadSchema = new mongoose.Schema(
   {
     property: {
       type: mongoose.Schema.Types.ObjectId,
@@ -27,25 +27,17 @@ const InspectionSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
-    date: {
-      type: String,
-      required: true,
-    },
-    time: {
-      type: String,
-      required: true,
-    },
     message: {
       type: String,
       default: '',
     },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'cancelled'],
-      default: 'pending',
+      enum: ['new', 'contacted', 'closed'],
+      default: 'new',
     },
   },
   { timestamps: true }
 )
 
-export default mongoose.model('Inspection', InspectionSchema)
+export default mongoose.model('Lead', LeadSchema)

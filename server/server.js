@@ -11,7 +11,9 @@ import messageRoutes      from './routes/messageRoutes.js'
 import reviewRoutes       from './routes/reviewRoutes.js'
 import paymentRoutes      from './routes/paymentRoutes.js'
 import leadRoutes         from './routes/leadRoutes.js'
-import inspectionRoutes   from './routes/inspectionRoutes.js' // ✅ NEW
+import inspectionRoutes   from './routes/inspectionRoutes.js'
+import venueRoutes        from './routes/venueRoutes.js'
+import bookingRoutes      from './routes/bookingRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -26,7 +28,7 @@ const io = new Server(httpServer, {
   },
 })
 
-// Make io accessible inside routes (e.g. for real-time inspection alerts)
+// Make io accessible inside routes
 app.set('io', io)
 
 app.use(cors({
@@ -43,7 +45,9 @@ app.use('/api/messages',    messageRoutes)
 app.use('/api/reviews',     reviewRoutes)
 app.use('/api/payments',    paymentRoutes)
 app.use('/api/leads',       leadRoutes)
-app.use('/api/inspections', inspectionRoutes) // ✅ NEW
+app.use('/api/inspections', inspectionRoutes)
+app.use('/api/venues',      venueRoutes)
+app.use('/api/bookings',    bookingRoutes)
 
 app.get('/', (req, res) => {
   res.json({ message: 'RentEase API is running!' })
@@ -82,14 +86,19 @@ io.on('connection', (socket) => {
     })
   })
 
-  // ✅ Real-time inspection booking alert to admin
+  // Real-time inspection booking alert to admin
   socket.on('inspection:new', (data) => {
     io.emit('inspection:alert', data)
   })
 
-  // ✅ Real-time lead alert to admin
+  // Real-time lead alert to admin
   socket.on('lead:new', (data) => {
     io.emit('lead:alert', data)
+  })
+
+  // Real-time venue booking alert to admin
+  socket.on('booking:new', (data) => {
+    io.emit('booking:alert', data)
   })
 
   // User goes offline

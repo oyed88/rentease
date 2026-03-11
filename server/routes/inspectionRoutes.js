@@ -6,25 +6,39 @@ const router = express.Router()
 // POST /api/inspections — Buyer books inspection
 router.post('/', async (req, res) => {
   try {
-    const { property, buyerName, buyerPhone, date, time } = req.body
+    const {
+      property,
+      buyerName,
+      buyerEmail,
+      buyerPhone,
+      buyerAddress,
+      date,
+      time,
+      message,
+    } = req.body
 
     if (!property || !buyerName || !buyerPhone || !date || !time) {
-      return res.status(400).json({ message: 'All fields are required.' })
+      return res.status(400).json({
+        message: 'Property, name, phone, date and time are required.',
+      })
     }
 
     const inspection = await Inspection.create({
       property,
       buyerName,
+      buyerEmail,
       buyerPhone,
+      buyerAddress,
       date,
       time,
+      message,
     })
 
-    // ✅ Emit real-time alert to admin
+    // Real-time alert to admin
     const io = req.app.get('io')
     if (io) {
       io.emit('inspection:alert', {
-        message: `📅 New inspection booked by ${buyerName}`,
+        message: `📅 New inspection booked by ${buyerName} on ${date} at ${time}`,
         inspection,
       })
     }
@@ -62,7 +76,7 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-// PATCH /api/inspections/:id — Admin confirms or cancels
+// PATCH /api/inspections/:id — Confirm or cancel
 router.patch('/:id', async (req, res) => {
   try {
     const { status } = req.body
@@ -87,7 +101,7 @@ router.patch('/:id', async (req, res) => {
   }
 })
 
-// DELETE /api/inspections/:id — Admin deletes inspection
+// DELETE /api/inspections/:id — Delete inspection
 router.delete('/:id', async (req, res) => {
   try {
     await Inspection.findByIdAndDelete(req.params.id)

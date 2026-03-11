@@ -35,6 +35,9 @@ export default function NavBar() {
             <Link to="/properties" className="font-body text-sm text-gray-600 hover:text-primary-600 transition-colors">
               Properties
             </Link>
+            <Link to="/venues" className="font-body text-sm text-gray-600 hover:text-primary-600 transition-colors">
+              Venues
+            </Link>
             {isLoggedIn && (
               <Link to="/dashboard" className="font-body text-sm text-gray-600 hover:text-primary-600 transition-colors">
                 Dashboard
@@ -87,6 +90,7 @@ export default function NavBar() {
           <div className="md:hidden py-4 border-t border-gray-100 flex flex-col gap-3">
             <Link to="/" className="font-body text-sm text-gray-600 py-2" onClick={() => setMenuOpen(false)}>Home</Link>
             <Link to="/properties" className="font-body text-sm text-gray-600 py-2" onClick={() => setMenuOpen(false)}>Properties</Link>
+            <Link to="/venues" className="font-body text-sm text-gray-600 py-2" onClick={() => setMenuOpen(false)}>Venues</Link>
             {isLoggedIn ? (
               <>
                 <Link to="/dashboard" className="font-body text-sm text-gray-600 py-2" onClick={() => setMenuOpen(false)}>Dashboard</Link>
